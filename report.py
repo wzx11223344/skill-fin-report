@@ -48,12 +48,22 @@ rcParams.update({
 # Helpers
 # ---------------------------------------------------------------------------
 def fig_to_base64(fig):
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
-    buf.seek(0)
-    img_b64 = base64.b64encode(buf.read()).decode()
-    plt.close(fig)
-    return img_b64
+    if fig is None:
+        return ""
+    try:
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
+        buf.seek(0)
+        img_b64 = base64.b64encode(buf.read()).decode()
+        return img_b64
+    except Exception as e:
+        print(f"[WARN] fig_to_base64 failed: {e}", file=sys.stderr)
+        return ""
+    finally:
+        try:
+            plt.close(fig)
+        except Exception:
+            pass
 
 
 def render(template_name, data, output_path):
